@@ -1,7 +1,7 @@
 
 import System.IO(stderr, hPutStrLn)
 import System.Exit(exitFailure)
-import System.Environment(getArgs)
+import System.Environment(getArgs, lookupEnv)
 import Control.Monad.Trans.Class(lift)
 import qualified System.Console.Haskeline as RL(
         InputT, runInputT, getInputLine, defaultSettings,
@@ -48,6 +48,7 @@ banner =
 
 usage :: Bool -> IO a
 usage full = do
+  defaultOptions <- getDefaultOptions
   putStr ("Qriollo versión " ++ version ++ "\n")
   putStr ("Uso: qr [opciones] [entrada[.q]]\n")
   putStr ("\nOpciones principales\n")
@@ -55,7 +56,7 @@ usage full = do
           "Modo chinela (CHupar, INterpretar, Escupir La sAlida).\n")
   putStr ("-p <nombre>   : " ++
           "Nombre del punto de entrada principal " ++
-          dflt OptQ_MainName ++ ".\n")
+          dflt defaultOptions OptQ_MainName ++ ".\n")
   putStr ("-t, --tipo    : " ++
           "Muestra el tipo del programa, sin ejecutarlo.\n")
   putStr ("--py          : " ++
@@ -98,7 +99,7 @@ usage full = do
     putStr ("--mval : Escupe el resultado.\n")
     putStr ("\nMejoras\n")
     putStr ("--manija <n> : Cantidad de rondas de optimización " ++
-            dflt OptQ_OptimizationRounds ++ ".\n")
+            dflt defaultOptions OptQ_OptimizationRounds ++ ".\n")
     putStr ("--lenteja    : " ++
             "Optimiza el tamaño del programa (puede ser más lento).\n")
    else do
@@ -108,22 +109,34 @@ usage full = do
   putStr ("  qr Fulano    # ejecuta\n")
   putStr ("  qr -i Fulano # modo interactivo\n")
   putStr ("  qr Fulano --py | python -  # ejecuta en Python \n")
-  putStr ("  qr Fulano --c -o f.c && gcc -o f f.c -Wall && ./f  # ejecuta en C\n")
+  putStr ("  qr Fulano --c -o f.c && gcc -o f f.c -Wall && ./f  " ++
+          "# ejecuta en C\n")
   exitFailure
-
   where
-    dflt :: OptionQ -> String
-    dflt key = "[=" ++ Map.findWithDefault "" key defaultOptions ++ "]"
+    dflt :: OptionsQ -> OptionQ -> String
+    dflt defaultOptions key =
+      "[=" ++ Map.findWithDefault "" key defaultOptions ++ "]"
 
-defaultOptions :: OptionsQ
-defaultOptions = Map.fromList [
-    (OptQ_OptimizationRounds, show 4),
-    (OptQ_MainName, primMain)
-  ]
+getDefaultOptions :: IO OptionsQ
+getDefaultOptions = do
+    path <- getPath
+    return $ Map.fromList [
+      (OptQ_OptimizationRounds, show 4),
+      (OptQ_MainName, primMain),
+      (OptQ_Path, path)
+     ]
+  where
+    getPath :: IO String
+    getPath = do
+      mPath <- lookupEnv "RUTA_QRIOLLO"
+      case mPath of
+        Nothing   -> return "."
+        Just path -> return path
 
 parseOptions :: IO OptionsQ
 parseOptions = do
     args <- getArgs
+    defaultOptions <- getDefaultOptions
     rec args defaultOptions
   where
     rec :: [String] -> OptionsQ -> IO OptionsQ
