@@ -189,7 +189,21 @@ instance Show (AnnotType a) where
       isList (AConstructorT _ (QualifId ["PRIM"] "Lista")) [_] = True
       isList _ _ = False
     
-  show (AMetavarT _ m)      = "?" ++ show m
+  show (AMetavarT _ m) =
+      metavars !! fromIntegral (m `mod` fromIntegral (length metavars)) ++
+      suffix (m `div` fromIntegral (length metavars))
+    where
+      metavars :: [String]
+      metavars = [
+        "coso", "cosito", "fulano", "mengano", "zutano", "perengano",
+        "fernández", "rodríguez", "gonzález", "garcía",
+        "lópez", "martínez", "pérez", "álvarez", "gómez",
+        "minga", "montoto", "magoya", "mongo", "cadorna", "pepe", "pepito",
+        "sarasa"
+       ]
+      suffix :: Integer -> String
+      suffix 0 = ""
+      suffix n = show n
 
 ---- Functor
 
