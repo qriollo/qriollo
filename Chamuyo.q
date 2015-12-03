@@ -200,7 +200,7 @@ una Lista de a es
   bien Vacía
   bien : a [a]
 
-el plegard de (coso en cosito en coso)
+el plegard de (coso en cosito en cosito)
            en cosito
            en [coso] en cosito
   dadas f z []       da z
