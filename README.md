@@ -6,7 +6,7 @@ El lenguaje de programación más boludo del mundo.
 [http://qriollo.github.io](http://qriollo.github.io)
 
 
-#Instalar en Debian 
+## Instalar en Debian 
 
 Primero instalamos las dependencias 
 ```
@@ -30,5 +30,9 @@ ghc -isrc --make src/Main.hs -o qr -rtsopts
 ```
 
 Probamos 
+
+```
 $ ./qr HolaMundo.q
 Hola mundo
+
+```
