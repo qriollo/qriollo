@@ -79,7 +79,7 @@ envGet key env = getKey (envRibs env)
         _            -> Nothing
 
 envAllValues :: Env a b -> [b]
-envAllValues = Map.fold (++) [] . envRibs
+envAllValues = foldr (++) [] . envRibs
 
 envFromList :: Ord a => [(a, b)] -> Env a b
 envFromList = foldr (uncurry envDefine) envEmpty
